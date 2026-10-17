@@ -40,8 +40,8 @@ export const Heart3DViewport: React.FC<Heart3DViewportProps> = ({
   const svgRef = useRef<SVGSVGElement | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
-  const [loadingProgress, setLoadingProgress] = useState(20);
-  const [loadStatus, setLoadStatus] = useState('Fetching /models/heart.glb...');
+  const [loadingProgress, setLoadingProgress] = useState(25);
+  const [loadStatus, setLoadStatus] = useState('Loading anatomical 3D heart model...');
   const [loadError, setLoadError] = useState<string | null>(null);
 
   const [showAnnotations, setShowAnnotations] = useState(false);
@@ -59,7 +59,7 @@ export const Heart3DViewport: React.FC<Heart3DViewportProps> = ({
 
   const isDraggingRef = useRef(false);
   const prevMouseRef = useRef({ x: 0, y: 0 });
-  const sphericalRef = useRef({ radius: 3.2, theta: -0.35, phi: 1.35 });
+  const sphericalRef = useRef({ radius: 3.5, theta: -0.35, phi: 1.35 });
   const modelPivotRef = useRef<THREE.Group | null>(null);
   const mixerRef = useRef<THREE.AnimationMixer | null>(null);
   const animActionRef = useRef<THREE.AnimationAction | null>(null);
@@ -83,13 +83,14 @@ export const Heart3DViewport: React.FC<Heart3DViewportProps> = ({
   const cyclePhaseRef = useRef(cyclePhase);
   cyclePhaseRef.current = cyclePhase;
 
+  // Anatomical anchor definitions adjusted to lowered, centered heart geometry
   const annotationsDefRef = useRef<AnnotationDef[]>([
     {
       id: "rightAtrium",
       label: "Right Atrium",
       subtitle: "Deoxygenated venous inflow",
       jointName: "right_atrium_jnt.6",
-      fallbackAnchor: new THREE.Vector3(-0.42, 0.48, 0.22),
+      fallbackAnchor: new THREE.Vector3(-0.28, 0.16, 0.12),
       screenSide: "left",
       offset: { x: -75, y: -25 },
       color: "#0284c7",
@@ -101,7 +102,7 @@ export const Heart3DViewport: React.FC<Heart3DViewportProps> = ({
       label: "Right Ventricle",
       subtitle: "Pulmonary low-pressure pump",
       jointName: "right_tricuspid_valve_jnt.24",
-      fallbackAnchor: new THREE.Vector3(-0.22, -0.12, 0.22),
+      fallbackAnchor: new THREE.Vector3(-0.16, -0.45, 0.18),
       screenSide: "left",
       offset: { x: -80, y: 35 },
       color: "#0284c7",
@@ -113,7 +114,7 @@ export const Heart3DViewport: React.FC<Heart3DViewportProps> = ({
       label: "Left Atrium",
       subtitle: "Oxygenated pulmonary inflow",
       jointName: "left_atrium_jnt.13",
-      fallbackAnchor: new THREE.Vector3(0.30, 0.55, 0.20),
+      fallbackAnchor: new THREE.Vector3(0.20, 0.05, -0.05),
       screenSide: "right",
       offset: { x: 75, y: -30 },
       color: "#dc2626",
@@ -125,7 +126,7 @@ export const Heart3DViewport: React.FC<Heart3DViewportProps> = ({
       label: "Left Ventricle",
       subtitle: "Systemic high-pressure chamber",
       jointName: "cardiac_muscle_jnt.7",
-      fallbackAnchor: new THREE.Vector3(0.12, -0.22, 0.20),
+      fallbackAnchor: new THREE.Vector3(0.10, -0.50, 0.10),
       screenSide: "right",
       offset: { x: 80, y: 40 },
       color: "#dc2626",
@@ -137,7 +138,7 @@ export const Heart3DViewport: React.FC<Heart3DViewportProps> = ({
       label: "Mitral Valve",
       subtitle: "Bicuspid AV valve (LA → LV)",
       jointName: "left_mitral_valve_jnt.15",
-      fallbackAnchor: new THREE.Vector3(0.20, 0.20, 0.20),
+      fallbackAnchor: new THREE.Vector3(0.18, -0.10, 0.05),
       screenSide: "right",
       offset: { x: 85, y: 5 },
       color: "#059669",
@@ -149,7 +150,7 @@ export const Heart3DViewport: React.FC<Heart3DViewportProps> = ({
       label: "Aortic Valve",
       subtitle: "Semilunar outflow (LV → Ao)",
       jointName: "aortic_valve_02_jnt.17",
-      fallbackAnchor: new THREE.Vector3(0.07, 0.22, 0.22),
+      fallbackAnchor: new THREE.Vector3(0.04, -0.05, 0.16),
       screenSide: "right",
       offset: { x: 70, y: -70 },
       color: "#059669",
@@ -160,7 +161,7 @@ export const Heart3DViewport: React.FC<Heart3DViewportProps> = ({
       id: "aorta",
       label: "Aorta",
       subtitle: "Systemic arterial root & arch",
-      fallbackAnchor: new THREE.Vector3(0.02, 0.80, 0.10),
+      fallbackAnchor: new THREE.Vector3(-0.01, 0.52, 0.05),
       screenSide: "right",
       offset: { x: 65, y: -65 },
       color: "#b91c1c",
@@ -172,7 +173,7 @@ export const Heart3DViewport: React.FC<Heart3DViewportProps> = ({
       label: "Pulmonary Artery",
       subtitle: "Deoxygenated outflow to lungs",
       jointName: "right_pulmonary_valve_jnt.9",
-      fallbackAnchor: new THREE.Vector3(-0.16, 0.62, 0.20),
+      fallbackAnchor: new THREE.Vector3(-0.12, 0.32, 0.10),
       screenSide: "left",
       offset: { x: -75, y: -55 },
       color: "#0284c7",
@@ -185,7 +186,7 @@ export const Heart3DViewport: React.FC<Heart3DViewportProps> = ({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // 1. Scene
+    // 1. Scene setup
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x070b14);
 
@@ -193,13 +194,13 @@ export const Heart3DViewport: React.FC<Heart3DViewportProps> = ({
     scene.add(modelPivot);
     modelPivotRef.current = modelPivot;
 
-    // 2. Camera
+    // 2. Camera setup - centered on lowered heart origin (0, -0.28, 0)
     const width = canvas.clientWidth || 500;
     const height = canvas.clientHeight || 700;
     const camera = new THREE.PerspectiveCamera(40, width / height, 0.05, 100);
     cameraRef.current = camera;
 
-    const target = new THREE.Vector3(0, 0.05, 0);
+    const target = new THREE.Vector3(0, -0.28, 0);
 
     const updateCamera = () => {
       const s = sphericalRef.current;
@@ -221,60 +222,61 @@ export const Heart3DViewport: React.FC<Heart3DViewportProps> = ({
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.setSize(width, height, false);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.0;
+    renderer.toneMappingExposure = 1.05;
 
-    // 4. Balanced Natural Lighting for Organic Muscle Tissue
-    const ambientLight = new THREE.AmbientLight(0x1e293b, 1.15);
+    // 4. Balanced Natural Ambient & Directional Lighting for Organic Myocardium
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.35);
     scene.add(ambientLight);
 
-    const keyLight = new THREE.DirectionalLight(0xffffff, 1.4);
-    keyLight.position.set(3, 5, 4);
+    const keyLight = new THREE.DirectionalLight(0xffffff, 1.3);
+    keyLight.position.set(2.5, 4.0, 3.5);
     scene.add(keyLight);
 
-    const fillLight = new THREE.DirectionalLight(0x64748b, 0.65);
-    fillLight.position.set(-4, 2, -2);
+    const fillLight = new THREE.DirectionalLight(0xe0e7ff, 0.7);
+    fillLight.position.set(-3.5, 1.5, -2.0);
     scene.add(fillLight);
 
-    const rimLight = new THREE.DirectionalLight(0x38bdf8, 0.9);
-    rimLight.position.set(0, -3, -4);
+    const rimLight = new THREE.DirectionalLight(0x38bdf8, 0.7);
+    rimLight.position.set(0, -2.5, -3.5);
     scene.add(rimLight);
     rimLightRef.current = rimLight;
 
-    // 5. Dense Dual-Color Blood Particle Dynamics (720+ particles)
-    // Oxygenated (Red) LA -> Mitral -> LV -> Aortic -> Ascending Aorta
+    // 5. Dense Blood Flow Particles Strictly Contained Inside Internal Chambers & Valves
+    // Red oxygenated particles strictly circulate inside the Left Ventricle cavity and flow upward through Aortic Valve into Aorta
+    // Lowest Y is -0.75 (inside ventricular apex), highest Y is 0.58 (inside aortic arch) -> NO particles in open air
     const oxWaypoints = [
-      new THREE.Vector3(0.35, 0.68, -0.02),
-      new THREE.Vector3(0.30, 0.52, 0.12),
-      new THREE.Vector3(0.22, 0.36, 0.16),
-      new THREE.Vector3(0.18, 0.20, 0.18),  // Mitral valve opening
-      new THREE.Vector3(0.14, 0.04, 0.20),  // LV inlet
-      new THREE.Vector3(0.12, -0.18, 0.20), // LV chamber body
-      new THREE.Vector3(0.10, -0.34, 0.18), // LV apex
-      new THREE.Vector3(0.11, -0.16, 0.22), // LVOT
-      new THREE.Vector3(0.09, 0.04, 0.23),
-      new THREE.Vector3(0.07, 0.22, 0.22),  // Aortic valve opening
-      new THREE.Vector3(0.06, 0.42, 0.18),  // Aortic root
-      new THREE.Vector3(0.04, 0.65, 0.14),  // Ascending aorta
-      new THREE.Vector3(0.00, 0.86, 0.06),  // Aortic arch
-      new THREE.Vector3(-0.14, 0.68, -0.14) // Descending aorta
+      new THREE.Vector3( 0.22,  0.05, -0.10), // Left Atrium chamber
+      new THREE.Vector3( 0.18, -0.10,  0.02), // Mitral Valve opening
+      new THREE.Vector3( 0.15, -0.25,  0.05), // LV upper inlet
+      new THREE.Vector3( 0.12, -0.50,  0.08), // LV mid cavity
+      new THREE.Vector3( 0.08, -0.75,  0.06), // LV apical cavity (deep internal, well above outer apex -1.19)
+      new THREE.Vector3( 0.06, -0.45,  0.12), // LVOT ascending
+      new THREE.Vector3( 0.05, -0.20,  0.15), // Sub-aortic vestibule
+      new THREE.Vector3( 0.04, -0.05,  0.16), // Aortic Valve opening
+      new THREE.Vector3( 0.03,  0.18,  0.14), // Aortic Root / Sinus
+      new THREE.Vector3( 0.02,  0.38,  0.10), // Ascending Aorta
+      new THREE.Vector3(-0.01,  0.58,  0.04), // Aorta Arch peak
+      new THREE.Vector3(-0.08,  0.48, -0.06), // Descending Aorta
+      new THREE.Vector3( 0.14,  0.25, -0.10)  // Pulmonary vein return into LA
     ];
 
-    // Deoxygenated (Blue) RA -> Tricuspid -> RV -> Pulmonic -> PA
+    // Blue deoxygenated particles strictly circulate inside Right Atrium/Ventricle and flow into Pulmonic Valve
     const deoxWaypoints = [
-      new THREE.Vector3(-0.50, 0.78, -0.02), // SVC inflow
-      new THREE.Vector3(-0.44, 0.58, 0.10),
-      new THREE.Vector3(-0.38, 0.40, 0.16),  // RA body
-      new THREE.Vector3(-0.30, 0.24, 0.18),
-      new THREE.Vector3(-0.25, 0.10, 0.20),  // Tricuspid valve opening
-      new THREE.Vector3(-0.22, -0.06, 0.22), // RV inlet
-      new THREE.Vector3(-0.20, -0.22, 0.22), // RV chamber body
-      new THREE.Vector3(-0.18, -0.10, 0.24), // RV infundibulum
-      new THREE.Vector3(-0.15, 0.10, 0.24),
-      new THREE.Vector3(-0.12, 0.30, 0.22),  // Pulmonic valve opening
-      new THREE.Vector3(-0.11, 0.50, 0.18),  // Pulmonary trunk
-      new THREE.Vector3(-0.14, 0.68, 0.12),
-      new THREE.Vector3(-0.28, 0.74, 0.02),
-      new THREE.Vector3(-0.40, 0.70, -0.08)
+      new THREE.Vector3(-0.36,  0.48,  0.02), // Superior Vena Cava inflow
+      new THREE.Vector3(-0.32,  0.32,  0.08), // Upper Right Atrium
+      new THREE.Vector3(-0.28,  0.16,  0.12), // Mid Right Atrium
+      new THREE.Vector3(-0.24, -0.02,  0.14), // Approaches Tricuspid
+      new THREE.Vector3(-0.20, -0.15,  0.16), // Tricuspid Valve opening
+      new THREE.Vector3(-0.18, -0.32,  0.18), // RV inlet
+      new THREE.Vector3(-0.16, -0.55,  0.18), // RV cavity mid-body
+      new THREE.Vector3(-0.14, -0.68,  0.16), // RV cavity floor (well inside anterior chamber)
+      new THREE.Vector3(-0.12, -0.42,  0.18), // RV infundibulum
+      new THREE.Vector3(-0.10, -0.20,  0.18), // RVOT upper
+      new THREE.Vector3(-0.08, -0.02,  0.18), // Pulmonic Valve opening
+      new THREE.Vector3(-0.09,  0.18,  0.15), // Pulmonary Trunk
+      new THREE.Vector3(-0.12,  0.36,  0.10), // Main Pulmonary Artery
+      new THREE.Vector3(-0.20,  0.44,  0.02), // Pulmonary Bifurcation
+      new THREE.Vector3(-0.28,  0.40, -0.06)  // Pulmonary outflow loop
     ];
 
     const oxCurve = new THREE.CatmullRomCurve3(oxWaypoints, true, 'centripetal');
@@ -288,8 +290,8 @@ export const Heart3DViewport: React.FC<Heart3DViewportProps> = ({
       const grad = pCtx.createRadialGradient(32, 32, 0, 32, 32, 32);
       grad.addColorStop(0.0, 'rgba(255, 255, 255, 1.0)');
       grad.addColorStop(0.2, 'rgba(255, 255, 255, 0.85)');
-      grad.addColorStop(0.5, 'rgba(255, 255, 255, 0.4)');
-      grad.addColorStop(0.75, 'rgba(255, 255, 255, 0.1)');
+      grad.addColorStop(0.5, 'rgba(255, 255, 255, 0.40)');
+      grad.addColorStop(0.8, 'rgba(255, 255, 255, 0.08)');
       grad.addColorStop(1.0, 'rgba(255, 255, 255, 0.0)');
       pCtx.fillStyle = grad;
       pCtx.fillRect(0, 0, 64, 64);
@@ -309,10 +311,11 @@ export const Heart3DViewport: React.FC<Heart3DViewportProps> = ({
       const isOx = i < NUM_OX;
       const curve = isOx ? oxCurve : deoxCurve;
       const u = Math.random();
-      const speedJitter = 0.8 + Math.random() * 0.4;
-      const radiusJitter = Math.random() * 0.048;
+      const speedJitter = 0.85 + Math.random() * 0.30;
+      // Controlled, tight lateral dispersion so particles never drift outside the cutaway walls
+      const radiusJitter = 0.010 + Math.random() * 0.022;
       const angle = Math.random() * Math.PI * 2;
-      const sizeBase = isOx ? 0.08 + Math.random() * 0.035 : 0.075 + Math.random() * 0.035;
+      const sizeBase = isOx ? 0.075 + Math.random() * 0.025 : 0.070 + Math.random() * 0.025;
 
       particleData.push({ isOx, curve, u, speedJitter, radiusJitter, angle, sizeBase });
 
@@ -334,11 +337,11 @@ export const Heart3DViewport: React.FC<Heart3DViewportProps> = ({
     pGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
 
     const pMaterial = new THREE.PointsMaterial({
-      size: 0.13,
+      size: 0.11,
       sizeAttenuation: true,
       map: particleTex,
       transparent: true,
-      opacity: 0.92,
+      opacity: 0.95,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
       vertexColors: true
@@ -368,7 +371,7 @@ export const Heart3DViewport: React.FC<Heart3DViewportProps> = ({
     let candidateIdx = 0;
     const tryLoad = () => {
       if (candidateIdx >= candidatePaths.length) {
-        setLoadError('Heart 3D model asset could not be loaded from candidate paths.');
+        setLoadError('Heart 3D model could not be loaded from candidate paths.');
         setIsLoading(false);
         return;
       }
@@ -381,55 +384,41 @@ export const Heart3DViewport: React.FC<Heart3DViewportProps> = ({
         (gltf) => {
           const model = gltf.scene;
 
-          // Compute bounding box & auto-center
+          // Compute exact bounding box
           const box = new THREE.Box3().setFromObject(model);
           const size = box.getSize(new THREE.Vector3());
           const center = box.getCenter(new THREE.Vector3());
           const maxDim = Math.max(size.x, size.y, size.z);
 
-          // Scale model so max dimension comfortably fits the viewport (~2.1 units)
-          const scaleFactor = 2.1 / (maxDim || 1.0);
+          // Scale model so max dimension comfortably fits the viewport frustum
+          const scaleFactor = 1.85 / (maxDim || 1.0);
           model.scale.setScalar(scaleFactor);
 
+          // Center the 3D model in viewport and LOWER Y position so top Aorta arch is not cut off by top cards
           model.position.set(
             -center.x * scaleFactor,
-            -center.y * scaleFactor + 0.08,
+            -center.y * scaleFactor - 0.28,
             -center.z * scaleFactor
           );
 
-          // Apply natural matte muscle texture properties (roughness 0.50, metalness 0.0)
+          // PRESERVE embedded model textures & vertex colors (pink/red muscular tissue, blue/red vessels, white valves)
+          // Set mesh roughness to 0.4 and metalness to 0.0 with natural tissue appearance
           model.traverse((child: any) => {
             if (child.isMesh) {
               child.castShadow = true;
               child.receiveShadow = true;
-
-              const oldMat = Array.isArray(child.material) ? child.material[0] : child.material;
-
-              const physicalMat = new THREE.MeshPhysicalMaterial({
-                map: oldMat.map || null,
-                normalMap: oldMat.normalMap || null,
-                normalScale: oldMat.normalScale || new THREE.Vector2(1.0, 1.0),
-                roughnessMap: oldMat.roughnessMap || null,
-                metalnessMap: oldMat.metalnessMap || null,
-                aoMap: oldMat.aoMap || null,
-                aoMapIntensity: 1.0,
-                // Natural organic matte muscle tissue
-                roughness: 0.50,
-                metalness: 0.0,
-                clearcoat: 0.10,
-                clearcoatRoughness: 0.65,
-                reflectivity: 0.35,
-                ior: 1.36,
-                sheen: 0.25,
-                sheenColor: new THREE.Color(0xcc3333),
-                thickness: 1.2
-              });
-
-              child.material = physicalMat;
               child.frustumCulled = false;
+
+              const mats = Array.isArray(child.material) ? child.material : [child.material];
+              mats.forEach((mat: any) => {
+                if (mat) {
+                  if ('roughness' in mat) mat.roughness = 0.4;
+                  if ('metalness' in mat) mat.metalness = 0.0;
+                  mat.needsUpdate = true;
+                }
+              });
             }
 
-            // Capture skeletal bones for live annotations tracking
             if (child.isBone || (child.name && child.name.includes('jnt'))) {
               jointsRef.current[child.name] = child;
             }
@@ -437,13 +426,13 @@ export const Heart3DViewport: React.FC<Heart3DViewportProps> = ({
 
           modelPivot.add(model);
 
-          // Setup skeletal beating animation mixer
+          // Skeletal beating animation
           if (gltf.animations && gltf.animations.length > 0) {
             const mixer = new THREE.AnimationMixer(model);
             const clip = gltf.animations[0];
             const action = mixer.clipAction(clip);
             action.play();
-            action.timeScale = hrRef.current / 60.0;
+            action.timeScale = (hrRef.current / 60.0) * speedRef.current;
             mixerRef.current = mixer;
             animActionRef.current = action;
           }
@@ -530,12 +519,12 @@ export const Heart3DViewport: React.FC<Heart3DViewportProps> = ({
         mixerRef.current.update(dt);
       }
 
-      // Update dense chamber particle fluid
+      // Update particle fluid system with instant valve gating
       if (particleSystemRef.current && currentRunning) {
         const { particles, positions: posArr, colors: colArr, sizes: sizeArr, geometry: geom } = particleSystemRef.current;
         const hrScale = Math.max(30, Math.min(200, currentHr)) / 74.0;
         const coScale = Math.max(1.5, Math.min(10.0, currentLive.co)) / 5.4;
-        const baseVel = 0.28 * hrScale * coScale * currentSpeed;
+        const baseVel = 0.26 * hrScale * coScale * currentSpeed;
 
         const isMitralOpen = currentLive.valves.mitral.is_open;
         const isAorticOpen = currentLive.valves.aortic.is_open;
@@ -551,17 +540,41 @@ export const Heart3DViewport: React.FC<Heart3DViewportProps> = ({
           const p = particles[i];
           let valveMult = 1.0;
 
+          // VALVE GATING & HALTING LOGIC:
+          // When a valve is CLOSED, halt particle stream across that specific valve instantly!
           if (p.isOx) {
-            if (p.u >= 0.18 && p.u <= 0.32) {
-              valveMult = isMitralOpen ? 2.2 : 0.28;
-            } else if (p.u >= 0.58 && p.u <= 0.72) {
-              valveMult = isAorticOpen ? 2.6 : 0.25;
+            // RED OXYGENATED STREAM:
+            if (p.u >= 0.08 && p.u <= 0.22) {
+              // Mitral Valve opening zone (LA -> LV)
+              if (!isMitralOpen) {
+                valveMult = 0.0; // HALT STREAM INSTANTLY WHEN CLOSED
+              } else {
+                valveMult = 2.4; // Diastolic filling surge
+              }
+            } else if (p.u >= 0.55 && p.u <= 0.72) {
+              // Aortic Valve opening zone (LV -> Aorta)
+              if (!isAorticOpen) {
+                valveMult = 0.0; // HALT STREAM INSTANTLY WHEN CLOSED
+              } else {
+                valveMult = 2.8; // Systolic ejection surge
+              }
             }
           } else {
-            if (p.u >= 0.20 && p.u <= 0.33) {
-              valveMult = isTricuspidOpen ? 2.2 : 0.28;
-            } else if (p.u >= 0.58 && p.u <= 0.70) {
-              valveMult = isPulmonicOpen ? 2.6 : 0.25;
+            // BLUE DEOXYGENATED STREAM:
+            if (p.u >= 0.18 && p.u <= 0.32) {
+              // Tricuspid Valve opening zone (RA -> RV)
+              if (!isTricuspidOpen) {
+                valveMult = 0.0; // HALT STREAM INSTANTLY WHEN CLOSED
+              } else {
+                valveMult = 2.4; // Diastolic filling surge
+              }
+            } else if (p.u >= 0.55 && p.u <= 0.70) {
+              // Pulmonic Valve opening zone (RV -> PA)
+              if (!isPulmonicOpen) {
+                valveMult = 0.0; // HALT STREAM INSTANTLY WHEN CLOSED
+              } else {
+                valveMult = 2.8; // Systolic ejection surge
+              }
             }
           }
 
@@ -569,6 +582,7 @@ export const Heart3DViewport: React.FC<Heart3DViewportProps> = ({
             ? 1.0 + Math.sin((cp / 0.35) * Math.PI) * 0.75
             : 0.88;
 
+          // If valve is closed (valveMult = 0.0), particle halts immediately
           const pSpeed = baseVel * valveMult * systolicSurge * p.speedJitter;
           p.u = ((p.u + dt * pSpeed) % 1.0 + 1.0) % 1.0;
 
@@ -583,11 +597,12 @@ export const Heart3DViewport: React.FC<Heart3DViewportProps> = ({
           }
           binormVec.crossVectors(tanVec, normVec).normalize();
 
+          // Controlled internal chamber radius - strictly within lumen
           let sRadius = p.radiusJitter;
-          if ((p.u >= 0.20 && p.u <= 0.30) || (p.u >= 0.60 && p.u <= 0.70)) {
-            sRadius *= 0.40;
-          } else if (p.u >= 0.33 && p.u <= 0.55) {
-            sRadius *= 1.35;
+          if ((p.u >= 0.12 && p.u <= 0.22) || (p.u >= 0.58 && p.u <= 0.68)) {
+            sRadius *= 0.50; // Constrict through valve rings
+          } else if (p.u >= 0.25 && p.u <= 0.50) {
+            sRadius *= 1.35; // Expand inside ventricle cavity pool
           }
 
           pVec.addScaledVector(normVec, Math.cos(p.angle) * sRadius);
@@ -623,7 +638,7 @@ export const Heart3DViewport: React.FC<Heart3DViewportProps> = ({
           rimLightRef.current.intensity = 0.35 + alarm * 0.75;
         } else {
           rimLightRef.current.color.setHex(0x38bdf8);
-          rimLightRef.current.intensity = 0.9;
+          rimLightRef.current.intensity = 0.7;
         }
       }
 
@@ -745,7 +760,7 @@ export const Heart3DViewport: React.FC<Heart3DViewportProps> = ({
             </span>
           </div>
           <div className="font-mono text-[11px] font-bold text-slate-100 tracking-wider uppercase mb-1">
-            Loading Anatomical Cutaway Twin
+            Loading Anatomical Cutaway Model
           </div>
           <div className="font-mono text-[9px] text-slate-400 max-w-[220px] text-center truncate">
             {loadStatus}
