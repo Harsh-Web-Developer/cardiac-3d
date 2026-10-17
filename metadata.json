@@ -1,0 +1,8 @@
+{
+  "name": "CARDIA Hemodynamic Twin | Clinical Cockpit",
+  "description": "High-fidelity in-silico cardiovascular digital twin with real-time 0D/1D hemodynamics, interactive 3D cardiac viewport with dual-color blood flow particle dynamics, ECG/PV/flow waveforms, ML latent parameter inference, and AI physiological reasoning copilot.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
