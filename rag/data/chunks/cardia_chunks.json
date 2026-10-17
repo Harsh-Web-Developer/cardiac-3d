@@ -1,0 +1,549 @@
+[
+  {
+    "chunk_id": "cardia_001",
+    "title": "CARDIA Simulation Variables",
+    "text": "CARDIA's current heart simulation exposes the following state variables:\n`time`\n`heart_rate`\n`systolic_bp`\n`diastolic_bp`\n`map`\n`cardiac_output`\n`stroke_volume`\n`edv`\n`esv`\n`lv_pressure`\n`aortic_pressure`\n`blood_volume`\n`contractility`\n`svr`\n`valves.mitral`\n`valves.aortic`\n`valves.tricuspid`\n`valves.pulmonary`\nThe RAG system may use these values as observations from the simulation.\nThe RAG system must not invent additional simulation variables and must not change these values.\n---",
+    "source": "cardia_physiology.md",
+    "source_title": "CARDIA Internal Physiology Notes",
+    "source_type": "internal_educational_notes",
+    "authority_level": "project_reference",
+    "author": "CARDIA Team",
+    "chapter": "CARDIA Reference Material",
+    "topic": "simulation_variables",
+    "organ": "cardiovascular_system",
+    "mechanism": [
+      "directional_blood_flow",
+      "arterial_pressure",
+      "ventricular_contractility"
+    ],
+    "equation": [],
+    "page": null
+  },
+  {
+    "chunk_id": "cardia_002",
+    "title": "Heart Rate",
+    "text": "Definition\nHeart rate (HR) is the number of heartbeats occurring per minute.\nHeart rate is normally initiated by spontaneous electrical activity of pacemaker cells in the sinoatrial (SA) node.\nCARDIA Variable\nCARDIA represents heart rate using:\n`heart_rate`\nThe value is interpreted as beats per minute (bpm).\nPhysiological Relationship\nHeart rate is one of the two primary determinants of cardiac output:\n`Cardiac Output = Heart Rate × Stroke Volume`\nAn increase in heart rate can increase cardiac output when stroke volume is maintained, although very large increases in heart rate can reduce ventricular filling time.\nEvidence\nNCBI Bookshelf describes the SA node as the primary pacemaker and identifies heart rate as a determinant of cardiac output.\n---",
+    "source": "cardia_physiology.md",
+    "source_title": "CARDIA Internal Physiology Notes",
+    "source_type": "internal_educational_notes",
+    "authority_level": "project_reference",
+    "author": "CARDIA Team",
+    "chapter": "Cardiac Function",
+    "topic": "cardiac_rate",
+    "organ": "heart",
+    "mechanism": [
+      "cardiac_output",
+      "stroke_volume",
+      "electrical_conduction"
+    ],
+    "equation": [],
+    "page": null
+  },
+  {
+    "chunk_id": "cardia_003",
+    "title": "Stroke Volume",
+    "text": "Definition\nStroke volume (SV) is the volume of blood ejected by a ventricle during one cardiac contraction.\nEquation\n`SV = EDV - ESV`\nwhere:\n`EDV` = end-diastolic volume\n`ESV` = end-systolic volume\nCARDIA Variables\nCARDIA represents stroke volume using:\n`stroke_volume`\nThe simulation also exposes:\n`edv`\nand\n`esv`\nPhysiological Relationship\nFor a given heart rate, a reduction in stroke volume tends to reduce cardiac output.\nStroke volume is influenced by ventricular filling, resistance against which the ventricle ejects, and myocardial contractility.\n---",
+    "source": "cardia_physiology.md",
+    "source_title": "CARDIA Internal Physiology Notes",
+    "source_type": "internal_educational_notes",
+    "authority_level": "project_reference",
+    "author": "CARDIA Team",
+    "chapter": "Cardiac Function",
+    "topic": "cardiac_output",
+    "organ": "heart",
+    "mechanism": [
+      "cardiac_output",
+      "stroke_volume",
+      "ventricular_contractility"
+    ],
+    "equation": [
+      "SV = EDV - ESV"
+    ],
+    "page": null
+  },
+  {
+    "chunk_id": "cardia_004",
+    "title": "Cardiac Output",
+    "text": "Definition\nCardiac output (CO) is the volume of blood pumped by a ventricle per unit time.\nEquation\n`CO = HR × SV`\nwhere:\n`CO` = cardiac output\n`HR` = heart rate\n`SV` = stroke volume\nCARDIA Variables\nCARDIA exposes:\n`cardiac_output`\n`heart_rate`\n`stroke_volume`\nDiagnostic Reasoning\nWhen CARDIA is asked:\n\"Why did cardiac output fall?\"\nthe RAG system should inspect the current simulation state and determine whether the observed change is associated with:\nreduced heart rate,\nreduced stroke volume,\nreduced EDV,\nincreased ESV,\nor another state change supported by retrieved physiological evidence.\nThe explanation must distinguish between an observed simulation value and a physiological mechanism supported by retrieved evidence.\nImportant Grounding Rule\nThe LLM must not invent a cause merely because it sounds physiologically plausible.\nIf the simulation state does not contain enough information to establish a cause, the answer should explicitly state that the available state is insufficient to determine the cause.\n---",
+    "source": "cardia_physiology.md",
+    "source_title": "CARDIA Internal Physiology Notes",
+    "source_type": "internal_educational_notes",
+    "authority_level": "project_reference",
+    "author": "CARDIA Team",
+    "chapter": "Cardiac Function",
+    "topic": "cardiac_output",
+    "organ": "heart",
+    "mechanism": [
+      "cardiac_output",
+      "stroke_volume"
+    ],
+    "equation": [
+      "CO = HR × SV"
+    ],
+    "page": null
+  },
+  {
+    "chunk_id": "cardia_005",
+    "title": "End-Diastolic Volume",
+    "text": "Definition\nEnd-diastolic volume (EDV) is the volume of blood in a ventricle at the end of ventricular filling, immediately before ventricular contraction.\nCARDIA Variable\n`edv`\nRelationship With Stroke Volume\nStroke volume can be represented as:\n`SV = EDV - ESV`\nTherefore, if EDV decreases while ESV remains unchanged, stroke volume decreases.\nIf EDV increases while other relevant factors remain unchanged, stroke volume can increase.\nCARDIA Interpretation\nEDV should be treated as an observed simulation value.\nThe RAG system should not assume why EDV changed unless the simulation provides sufficient information or the retrieved evidence supports the proposed mechanism.\n---",
+    "source": "cardia_physiology.md",
+    "source_title": "CARDIA Internal Physiology Notes",
+    "source_type": "internal_educational_notes",
+    "authority_level": "project_reference",
+    "author": "CARDIA Team",
+    "chapter": "Cardiac Function",
+    "topic": "ventricular_filling",
+    "organ": "heart",
+    "mechanism": [
+      "stroke_volume"
+    ],
+    "equation": [
+      "SV = EDV - ESV"
+    ],
+    "page": null
+  },
+  {
+    "chunk_id": "cardia_006",
+    "title": "End-Systolic Volume",
+    "text": "Definition\nEnd-systolic volume (ESV) is the volume of blood remaining in a ventricle after ventricular contraction and ejection.\nCARDIA Variable\n`esv`\nRelationship With Stroke Volume\n`SV = EDV - ESV`\nAn increase in ESV, with EDV unchanged, decreases stroke volume.\nA decrease in ESV, with EDV unchanged, increases stroke volume.\nRelationship With Contractility\nIn general cardiovascular physiology, increased ventricular contractility can increase ejection and reduce end-systolic volume, while reduced contractility can impair ventricular ejection and increase end-systolic volume.\nThe CARDIA RAG system must not claim that contractility caused a particular ESV change unless the live simulation state and retrieved evidence support that interpretation.\n---",
+    "source": "cardia_physiology.md",
+    "source_title": "CARDIA Internal Physiology Notes",
+    "source_type": "internal_educational_notes",
+    "authority_level": "project_reference",
+    "author": "CARDIA Team",
+    "chapter": "Cardiac Function",
+    "topic": "ventricular_emptying",
+    "organ": "heart",
+    "mechanism": [
+      "stroke_volume",
+      "ventricular_contractility"
+    ],
+    "equation": [
+      "SV = EDV - ESV"
+    ],
+    "page": null
+  },
+  {
+    "chunk_id": "cardia_007",
+    "title": "Cardiac Conduction System",
+    "text": "Overview\nThe cardiac conduction system generates and distributes electrical signals that coordinate atrial and ventricular contraction.\nThe major pathway represented in CARDIA is:\n`SA Node → AV Node → Bundle of His → Right/Left Bundle Branches → Purkinje Fibers`\nThis electrical sequence coordinates activation of the atria and ventricles.\n---",
+    "source": "cardia_physiology.md",
+    "source_title": "CARDIA Internal Physiology Notes",
+    "source_type": "internal_educational_notes",
+    "authority_level": "project_reference",
+    "author": "CARDIA Team",
+    "chapter": "Cardiac Electrophysiology",
+    "topic": "cardiac_conduction",
+    "organ": "cardiac_conduction_system",
+    "mechanism": [
+      "electrical_conduction"
+    ],
+    "equation": [],
+    "page": null
+  },
+  {
+    "chunk_id": "cardia_008",
+    "title": "SA Node",
+    "text": "Definition\nThe sinoatrial (SA) node is a group of specialized cells located in the upper region of the right atrium.\nIt normally acts as the primary pacemaker of the heart.\nFunction\nThe SA node spontaneously generates electrical impulses that initiate normal sinus rhythm.\nThe electrical signal spreads through the atrial myocardium and subsequently reaches the AV node.\nCARDIA Relevance\nThe SA node is a primary component of the interactive conduction-system visualization.\nA hypothetical failure of the SA node should be explained as a disruption of the normal pacemaker source.\nThe RAG system must distinguish between:\nwhat is physiologically established,\nwhat is hypothetical,\nand what the current CARDIA simulation actually models.\n---",
+    "source": "cardia_physiology.md",
+    "source_title": "CARDIA Internal Physiology Notes",
+    "source_type": "internal_educational_notes",
+    "authority_level": "project_reference",
+    "author": "CARDIA Team",
+    "chapter": "Cardiac Electrophysiology",
+    "topic": "cardiac_conduction",
+    "organ": "cardiac_conduction_system",
+    "mechanism": [
+      "electrical_conduction"
+    ],
+    "equation": [],
+    "page": null
+  },
+  {
+    "chunk_id": "cardia_009",
+    "title": "AV Node",
+    "text": "Definition\nThe atrioventricular (AV) node is specialized conduction tissue located near the junction between the atria and ventricles.\nFunction\nThe AV node receives the electrical signal from the atria and conducts it toward the ventricles through the His-Purkinje system.\nAV nodal conduction introduces a delay between atrial and ventricular activation.\nThis delay helps allow ventricular filling before ventricular contraction.\nBackup Pacemaker\nThe AV node can also provide pacemaker activity under some conditions when normal SA-node activity fails.\nIts intrinsic pacemaker rate is slower than the normal SA-node rate.\n\"What If the AV Node Stops Working?\"\nA complete loss of normal AV nodal conduction would disrupt normal electrical transmission from the atria to the ventricles.\nThe physiological consequence depends on the exact type and severity of conduction disturbance and whether another pacemaker site takes over.\nThe RAG system must not claim a specific heart rate or blood-pressure outcome unless that outcome is represented by the CARDIA simulation or supported by retrieved evidence.\n---",
+    "source": "cardia_physiology.md",
+    "source_title": "CARDIA Internal Physiology Notes",
+    "source_type": "internal_educational_notes",
+    "authority_level": "project_reference",
+    "author": "CARDIA Team",
+    "chapter": "Cardiac Electrophysiology",
+    "topic": "cardiac_conduction",
+    "organ": "cardiac_conduction_system",
+    "mechanism": [
+      "electrical_conduction"
+    ],
+    "equation": [],
+    "page": null
+  },
+  {
+    "chunk_id": "cardia_010",
+    "title": "Bundle of His",
+    "text": "Definition\nThe bundle of His, also called the atrioventricular bundle, is specialized conduction tissue that carries electrical impulses from the AV node into the ventricular conduction system.\nPathway\nThe pathway continues from:\n`AV Node → Bundle of His → Right/Left Bundle Branches → Purkinje Fibers`\nFunction\nThe bundle of His provides the electrical connection between the AV node and the ventricular conduction system.\nDisruption of conduction through this pathway can interfere with coordinated ventricular activation.\n---",
+    "source": "cardia_physiology.md",
+    "source_title": "CARDIA Internal Physiology Notes",
+    "source_type": "internal_educational_notes",
+    "authority_level": "project_reference",
+    "author": "CARDIA Team",
+    "chapter": "Cardiac Electrophysiology",
+    "topic": "cardiac_conduction",
+    "organ": "cardiac_conduction_system",
+    "mechanism": [
+      "electrical_conduction"
+    ],
+    "equation": [],
+    "page": null
+  },
+  {
+    "chunk_id": "cardia_011",
+    "title": "Purkinje Fibers",
+    "text": "Definition\nPurkinje fibers are specialized conducting fibers distributed throughout the ventricles.\nFunction\nThey rapidly distribute electrical activation through the ventricular myocardium.\nThis coordinated activation allows the ventricles to contract in an organized manner.\nCARDIA Relevance\nPurkinje fibers are part of the 3D conduction-system visualization.\nA hypothetical disruption should be described as impaired ventricular electrical activation rather than as an automatically predetermined change in a specific CARDIA variable.\n---",
+    "source": "cardia_physiology.md",
+    "source_title": "CARDIA Internal Physiology Notes",
+    "source_type": "internal_educational_notes",
+    "authority_level": "project_reference",
+    "author": "CARDIA Team",
+    "chapter": "Cardiac Electrophysiology",
+    "topic": "cardiac_conduction",
+    "organ": "cardiac_conduction_system",
+    "mechanism": [
+      "electrical_conduction"
+    ],
+    "equation": [],
+    "page": null
+  },
+  {
+    "chunk_id": "cardia_012",
+    "title": "Cardiac Valves",
+    "text": "Overview\nThe four major heart valves control the direction of blood flow through the heart.\nCARDIA represents four valve states:\n`mitral`\n`aortic`\n`tricuspid`\n`pulmonary`\nThe simulation provides these values as Boolean states.\nImportant CARDIA Rule\nThe RAG layer must interpret valve states exactly as provided by the simulation engine.\nIt must not silently flip, correct, or modify a valve state.\n---",
+    "source": "cardia_physiology.md",
+    "source_title": "CARDIA Internal Physiology Notes",
+    "source_type": "internal_educational_notes",
+    "authority_level": "project_reference",
+    "author": "CARDIA Team",
+    "chapter": "Cardiac Valves",
+    "topic": "cardiac_valves",
+    "organ": "heart",
+    "mechanism": [
+      "directional_blood_flow"
+    ],
+    "equation": [],
+    "page": null
+  },
+  {
+    "chunk_id": "cardia_013",
+    "title": "Mitral Valve",
+    "text": "Location\nThe mitral valve lies between the left atrium and left ventricle.\nFunction\nIt permits blood to flow from the left atrium into the left ventricle during ventricular filling.\nIt normally prevents backward flow from the left ventricle into the left atrium during ventricular contraction.\nCARDIA Variable\n`valves.mitral`\n---",
+    "source": "cardia_physiology.md",
+    "source_title": "CARDIA Internal Physiology Notes",
+    "source_type": "internal_educational_notes",
+    "authority_level": "project_reference",
+    "author": "CARDIA Team",
+    "chapter": "Cardiac Valves",
+    "topic": "cardiac_valves",
+    "organ": "heart",
+    "mechanism": [
+      "directional_blood_flow"
+    ],
+    "equation": [],
+    "page": null
+  },
+  {
+    "chunk_id": "cardia_014",
+    "title": "Aortic Valve",
+    "text": "Location\nThe aortic valve lies between the left ventricle and the aorta.\nFunction\nIt permits blood to leave the left ventricle and enter the aorta during ventricular ejection.\nIt prevents backward flow from the aorta into the left ventricle when the ventricle relaxes.\nCARDIA Variable\n`valves.aortic`\n---",
+    "source": "cardia_physiology.md",
+    "source_title": "CARDIA Internal Physiology Notes",
+    "source_type": "internal_educational_notes",
+    "authority_level": "project_reference",
+    "author": "CARDIA Team",
+    "chapter": "Cardiac Valves",
+    "topic": "cardiac_valves",
+    "organ": "heart",
+    "mechanism": [
+      "directional_blood_flow"
+    ],
+    "equation": [],
+    "page": null
+  },
+  {
+    "chunk_id": "cardia_015",
+    "title": "Tricuspid Valve",
+    "text": "Location\nThe tricuspid valve lies between the right atrium and right ventricle.\nFunction\nIt permits blood to flow from the right atrium into the right ventricle during ventricular filling.\nIt helps prevent backward flow from the right ventricle into the right atrium during ventricular contraction.\nCARDIA Variable\n`valves.tricuspid`\n---",
+    "source": "cardia_physiology.md",
+    "source_title": "CARDIA Internal Physiology Notes",
+    "source_type": "internal_educational_notes",
+    "authority_level": "project_reference",
+    "author": "CARDIA Team",
+    "chapter": "Cardiac Valves",
+    "topic": "cardiac_valves",
+    "organ": "heart",
+    "mechanism": [
+      "directional_blood_flow"
+    ],
+    "equation": [],
+    "page": null
+  },
+  {
+    "chunk_id": "cardia_016",
+    "title": "Pulmonary Valve",
+    "text": "Location\nThe pulmonary valve lies between the right ventricle and pulmonary artery.\nFunction\nIt permits blood to leave the right ventricle toward the pulmonary circulation during ventricular ejection.\nIt prevents backward flow from the pulmonary artery into the right ventricle during ventricular relaxation.\nCARDIA Variable\n`valves.pulmonary`\n---",
+    "source": "cardia_physiology.md",
+    "source_title": "CARDIA Internal Physiology Notes",
+    "source_type": "internal_educational_notes",
+    "authority_level": "project_reference",
+    "author": "CARDIA Team",
+    "chapter": "Cardiac Valves",
+    "topic": "cardiac_valves",
+    "organ": "heart",
+    "mechanism": [
+      "directional_blood_flow"
+    ],
+    "equation": [],
+    "page": null
+  },
+  {
+    "chunk_id": "cardia_017",
+    "title": "Blood Pressure",
+    "text": "Systolic Blood Pressure\nSystolic blood pressure (SBP) is the peak arterial pressure associated with ventricular systole.\nDiastolic Blood Pressure\nDiastolic blood pressure (DBP) is the lower arterial pressure associated with ventricular diastole.\nCARDIA Variables\n`systolic_bp`\n`diastolic_bp`\n---",
+    "source": "cardia_physiology.md",
+    "source_title": "CARDIA Internal Physiology Notes",
+    "source_type": "internal_educational_notes",
+    "authority_level": "project_reference",
+    "author": "CARDIA Team",
+    "chapter": "Cardiovascular Hemodynamics",
+    "topic": "hemodynamics",
+    "organ": "cardiovascular_system",
+    "mechanism": [
+      "cardiovascular_physiology"
+    ],
+    "equation": [],
+    "page": null
+  },
+  {
+    "chunk_id": "cardia_018",
+    "title": "Mean Arterial Pressure",
+    "text": "Definition\nMean arterial pressure (MAP) represents an approximation of the average arterial pressure during a cardiac cycle.\nCommon Approximation\nFor normal resting heart rates:\n`MAP ≈ DBP + 1/3(SBP - DBP)`\nEquivalent form:\n`MAP ≈ (SBP + 2 × DBP) / 3`\nCARDIA Variable\n`map`\nGrounding Rule\nIf CARDIA provides `map` directly, the RAG system should treat that value as the simulation's observed MAP.\nIt should not overwrite the simulation value with a newly calculated value unless the application explicitly requests a calculation.\n---",
+    "source": "cardia_physiology.md",
+    "source_title": "CARDIA Internal Physiology Notes",
+    "source_type": "internal_educational_notes",
+    "authority_level": "project_reference",
+    "author": "CARDIA Team",
+    "chapter": "Cardiovascular Hemodynamics",
+    "topic": "hemodynamics",
+    "organ": "cardiovascular_system",
+    "mechanism": [
+      "arterial_pressure"
+    ],
+    "equation": [
+      "MAP ≈ DBP + 1/3(SBP - DBP)"
+    ],
+    "page": null
+  },
+  {
+    "chunk_id": "cardia_019",
+    "title": "Systemic Vascular Resistance",
+    "text": "Definition\nSystemic vascular resistance (SVR), also called systemic vascular resistance/total peripheral resistance in related contexts, represents resistance to blood flow through the systemic circulation.\nCARDIA Variable\n`svr`\nPhysiological Relationship\nSVR contributes to the pressure-flow relationship of the systemic circulation.\nChanges in systemic vascular resistance can influence arterial pressure and the workload against which the left ventricle ejects.\nCARDIA Grounding Rule\nThe exact numerical meaning and scaling of the CARDIA `svr` variable are defined by the simulation engine.\nThe RAG layer must not assume an undocumented unit or normalization.\n---",
+    "source": "cardia_physiology.md",
+    "source_title": "CARDIA Internal Physiology Notes",
+    "source_type": "internal_educational_notes",
+    "authority_level": "project_reference",
+    "author": "CARDIA Team",
+    "chapter": "Cardiovascular Hemodynamics",
+    "topic": "hemodynamics",
+    "organ": "cardiovascular_system",
+    "mechanism": [
+      "cardiovascular_physiology"
+    ],
+    "equation": [],
+    "page": null
+  },
+  {
+    "chunk_id": "cardia_020",
+    "title": "Left Ventricular Pressure",
+    "text": "Definition\nLeft ventricular pressure is the pressure generated within the left ventricle during the cardiac cycle.\nCARDIA Variable\n`lv_pressure`\nPhysiological Relationship\nLeft ventricular pressure changes during filling, contraction, and ejection.\nDuring ventricular systole, pressure generated by the left ventricle allows the aortic valve to open when ventricular pressure exceeds aortic pressure.\nThe exact simulated valve transition is determined by CARDIA's simulation engine.\n---",
+    "source": "cardia_physiology.md",
+    "source_title": "CARDIA Internal Physiology Notes",
+    "source_type": "internal_educational_notes",
+    "authority_level": "project_reference",
+    "author": "CARDIA Team",
+    "chapter": "Cardiovascular Hemodynamics",
+    "topic": "ventricular_hemodynamics",
+    "organ": "heart",
+    "mechanism": [
+      "directional_blood_flow"
+    ],
+    "equation": [],
+    "page": null
+  },
+  {
+    "chunk_id": "cardia_021",
+    "title": "Aortic Pressure",
+    "text": "Definition\nAortic pressure is the pressure within the aorta.\nCARDIA Variable\n`aortic_pressure`\nPhysiological Relationship\nThe pressure relationship between the left ventricle and aorta is important for aortic-valve opening and ventricular ejection.\nThe RAG system should use the live simulation values when explaining the current state.\n---",
+    "source": "cardia_physiology.md",
+    "source_title": "CARDIA Internal Physiology Notes",
+    "source_type": "internal_educational_notes",
+    "authority_level": "project_reference",
+    "author": "CARDIA Team",
+    "chapter": "Cardiovascular Hemodynamics",
+    "topic": "arterial_hemodynamics",
+    "organ": "cardiovascular_system",
+    "mechanism": [
+      "directional_blood_flow"
+    ],
+    "equation": [],
+    "page": null
+  },
+  {
+    "chunk_id": "cardia_022",
+    "title": "Contractility",
+    "text": "Definition\nContractility describes the intrinsic ability of cardiac muscle to generate force during contraction, independent of changes in loading conditions.\nCARDIA Variable\n`contractility`\nPhysiological Relationship\nIncreased contractility can increase ventricular force generation and can increase ejection under appropriate conditions.\nReduced contractility can impair ventricular ejection.\nThe precise numerical scale of CARDIA's `contractility` variable is defined by the simulation engine.\nThe RAG system must not invent units for this variable.\n---",
+    "source": "cardia_physiology.md",
+    "source_title": "CARDIA Internal Physiology Notes",
+    "source_type": "internal_educational_notes",
+    "authority_level": "project_reference",
+    "author": "CARDIA Team",
+    "chapter": "Cardiac Function",
+    "topic": "ventricular_contractility",
+    "organ": "heart",
+    "mechanism": [
+      "ventricular_contractility"
+    ],
+    "equation": [],
+    "page": null
+  },
+  {
+    "chunk_id": "cardia_023",
+    "title": "Blood Volume",
+    "text": "Definition\nBlood volume is the volume of blood contained within the cardiovascular system.\nCARDIA Variable\n`blood_volume`\nCARDIA Grounding Rule\nThe RAG layer should treat `blood_volume` as an observed simulation variable.\nA change in blood volume may influence cardiovascular filling and pressure, but the RAG system must not infer a specific mechanism without sufficient evidence from the simulation and retrieved physiology.\n---",
+    "source": "cardia_physiology.md",
+    "source_title": "CARDIA Internal Physiology Notes",
+    "source_type": "internal_educational_notes",
+    "authority_level": "project_reference",
+    "author": "CARDIA Team",
+    "chapter": "Circulating Volume",
+    "topic": "circulating_volume",
+    "organ": "cardiovascular_system",
+    "mechanism": [
+      "circulating_volume"
+    ],
+    "equation": [],
+    "page": null
+  },
+  {
+    "chunk_id": "cardia_024",
+    "title": "Cardiac Cycle",
+    "text": "Overview\nThe cardiac cycle consists of alternating periods of ventricular filling and contraction.\nA simplified sequence is:\n1. Ventricular filling\n2. Ventricular contraction\n3. Ventricular ejection\n4. Ventricular relaxation\nValve states change during the cardiac cycle to maintain directional blood flow.\nCARDIA Relevance\nThe live simulation exposes valve states and pressure variables that can be used to explain the current simulated phase.\nThe RAG system should describe the observed state rather than inventing an unseen cardiac phase.\n---",
+    "source": "cardia_physiology.md",
+    "source_title": "CARDIA Internal Physiology Notes",
+    "source_type": "internal_educational_notes",
+    "authority_level": "project_reference",
+    "author": "CARDIA Team",
+    "chapter": "Cardiac Function",
+    "topic": "cardiac_cycle",
+    "organ": "heart",
+    "mechanism": [
+      "directional_blood_flow"
+    ],
+    "equation": [],
+    "page": null
+  },
+  {
+    "chunk_id": "cardia_025",
+    "title": "Cause-and-Effect Reasoning Rules",
+    "text": "CARDIA explanations should follow this hierarchy:\n1. Identify what changed in the live SimulationState.\n2. Retrieve relevant physiological evidence.\n3. Connect the observed change to a supported physiological mechanism.\n4. Clearly distinguish observation from inference.\n5. State uncertainty when the available state is insufficient.\n6. Never invent missing measurements.\n7. Never modify the simulation state.\nExample\nIf:\n`cardiac_output` decreases\nand:\n`stroke_volume` also decreases\nwhile:\n`heart_rate` remains approximately unchanged,\na supported explanation may identify the reduction in stroke volume as a contributor to the reduction in cardiac output because:\n`CO = HR × SV`\nThe system should not automatically claim that preload, afterload, contractility, or a valve abnormality caused the stroke-volume change unless the available state and retrieved evidence support that claim.\n---",
+    "source": "cardia_physiology.md",
+    "source_title": "CARDIA Internal Physiology Notes",
+    "source_type": "internal_educational_notes",
+    "authority_level": "project_reference",
+    "author": "CARDIA Team",
+    "chapter": "CARDIA Simulation Reasoning",
+    "topic": "causal_reasoning",
+    "organ": "cardiovascular_system",
+    "mechanism": [
+      "cardiac_output",
+      "stroke_volume",
+      "directional_blood_flow",
+      "ventricular_contractility"
+    ],
+    "equation": [
+      "CO = HR × SV"
+    ],
+    "page": null
+  },
+  {
+    "chunk_id": "cardia_026",
+    "title": "Current CARDIA Baseline State",
+    "text": "The current example state supplied by the CARDIA simulation team is:\n`time`: 12.42\n`heart_rate`: 82\n`systolic_bp`: 118\n`diastolic_bp`: 76\n`map`: 90\n`cardiac_output`: 5.2\n`stroke_volume`: 63\n`edv`: 128\n`esv`: 65\n`lv_pressure`: 115\n`aortic_pressure`: 90\n`blood_volume`: 100\n`contractility`: 100\n`svr`: 100\nValve state:\n`mitral`: false\n`aortic`: true\n`tricuspid`: false\n`pulmonary`: true\nThese values are an example/current simulation state, not universal physiological reference values.\nThe RAG system must use live SimulationState values supplied at query time rather than treating this example state as permanently current.\n---",
+    "source": "cardia_physiology.md",
+    "source_title": "CARDIA Internal Physiology Notes",
+    "source_type": "internal_educational_notes",
+    "authority_level": "project_reference",
+    "author": "CARDIA Team",
+    "chapter": "CARDIA Simulation Reasoning",
+    "topic": "simulation_state",
+    "organ": "cardiovascular_system",
+    "mechanism": [
+      "directional_blood_flow",
+      "arterial_pressure",
+      "ventricular_contractility"
+    ],
+    "equation": [],
+    "page": null
+  },
+  {
+    "chunk_id": "cardia_027",
+    "title": "Evidence Sources",
+    "text": "The initial physiology content is based on established cardiovascular physiology references, primarily NCBI Bookshelf resources:\nNCBI Bookshelf — In brief: How is the heart rhythm regulated?\nNCBI Bookshelf — Physiology, Cardiac\nNCBI Bookshelf — Physiology, Cardiac Output\nNCBI Bookshelf — Physiology, Cardiovascular\nNCBI Bookshelf — Blood Pressure Measurement\nNCBI Bookshelf — Physiology, AV Junction\nNCBI Bookshelf — Physiology, Bundle of His\nThese sources should be retained as provenance references when the knowledge base is expanded.\n---",
+    "source": "cardia_physiology.md",
+    "source_title": "CARDIA Internal Physiology Notes",
+    "source_type": "internal_educational_notes",
+    "authority_level": "project_reference",
+    "author": "CARDIA Team",
+    "chapter": "CARDIA Reference Material",
+    "topic": "provenance",
+    "organ": "cardiovascular_system",
+    "mechanism": [
+      "cardiac_output"
+    ],
+    "equation": [],
+    "page": null
+  },
+  {
+    "chunk_id": "cardia_028",
+    "title": "RAG Safety Rules",
+    "text": "The RAG system must follow these rules:\nRetrieved evidence is the grounding source for physiological claims.\nThe LLM must not fabricate citations.\nThe LLM must not invent measurements.\nThe LLM must not modify SimulationState.\nThe LLM must not treat a hypothetical \"What If\" scenario as an observed event.\nThe LLM must distinguish simulation observations from physiological explanations.\nIf evidence is insufficient, the system must say so.\nIf retrieval confidence is low, the system must not bluff.\nCurrent simulation values always come from the simulation engine.\nThe knowledge base describes physiology; it does not control the simulation.\n---",
+    "source": "cardia_physiology.md",
+    "source_title": "CARDIA Internal Physiology Notes",
+    "source_type": "internal_educational_notes",
+    "authority_level": "project_reference",
+    "author": "CARDIA Team",
+    "chapter": "CARDIA Reference Material",
+    "topic": "safety",
+    "organ": "cardiovascular_system",
+    "mechanism": [
+      "cardiovascular_physiology"
+    ],
+    "equation": [],
+    "page": null
+  },
+  {
+    "chunk_id": "cardia_029",
+    "title": "Source Provenance",
+    "text": "Source type: Curated physiology knowledge base\nPrimary reference collection: NCBI Bookshelf / National Library of Medicine\nIntended use: Educational hackathon demonstration and evidence-grounded explanations inside CARDIA.\nThis knowledge base is not a clinical diagnostic system and should not be used as a substitute for professional medical advice.",
+    "source": "cardia_physiology.md",
+    "source_title": "CARDIA Internal Physiology Notes",
+    "source_type": "internal_educational_notes",
+    "authority_level": "project_reference",
+    "author": "CARDIA Team",
+    "chapter": "CARDIA Reference Material",
+    "topic": "provenance",
+    "organ": "cardiovascular_system",
+    "mechanism": [
+      "cardiovascular_physiology"
+    ],
+    "equation": [],
+    "page": null
+  }
+]
